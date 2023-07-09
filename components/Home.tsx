@@ -1,10 +1,13 @@
 /* eslint-disable prettier/prettier */
 import React from 'react';
-import {Text, View} from 'react-native';
+import { Container, TextWhite } from '../App.styles';
+import { Card } from './Card';
 export function Home() {
     return (
-        <View>
-            <Text>Home Page!</Text>
-        </View>
+        <Container>
+            <TextWhite>Home Page!</TextWhite>
+            <Card task={{}}/>
+            <Card task={{}}/>
+        </Container>
     );
 }
