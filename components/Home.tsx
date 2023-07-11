@@ -9,6 +9,7 @@ import { ActivityIndicator, MD2Colors, Modal } from 'react-native-paper';
 import { View } from 'react-native'
 import Create from './tasks/Create';
 import { Loading } from './Loading';
+import { Icon } from 'react-native-elements'
 export function Home() {
 
     const [tasks, setTasks]: any[] = React.useState([])
@@ -26,8 +27,7 @@ export function Home() {
             const tasksCol = collection(db, 'tasks');
             const tasksSnapshot = await getDocs(tasksCol);
             const tasksList: any = tasksSnapshot.docs.map(task => task.data());
-            setTasks([...tasksList])
-            console.log('O que vem aqui: ', tasksList);
+            setTasks([...tasksList]);
         } catch ( error: any) {
             console.log('Deu erro: ', error);
         } finally {
@@ -50,7 +50,7 @@ export function Home() {
                 tasksList.push(taskList);
             }
         );
-        //console.log(tasksList)
+
         setTasks(tasksList);
     }
 
@@ -63,7 +63,7 @@ export function Home() {
             { loading && <Loading/> }
             <Container>
                 {
-                    tasks.map((task: any, indice: any) => {
+                    !visibleModal && tasks.map((task: any, indice: any) => {
                         return (
                             <Card task={task} key={indice} changeStatus={changeTaskStatus}/>
                         );
@@ -76,12 +76,12 @@ export function Home() {
                             <TextBlack>Reload</TextBlack>
                         </RoundButton>
                         <RoundButton onPress={showModal}>
-                            <TextBlack>ADD</TextBlack>
+                            <TextBlack>+</TextBlack>
                         </RoundButton>
                     </ViewBottom>
                 }
                 <Modal visible={visibleModal} dismissableBackButton={true} onDismiss={hideModal} contentContainerStyle={containerStyle}>
-                    <Create/>
+                    <Create closeModal={hideModal}/>
                 </Modal>
             </Container>
         </View>
