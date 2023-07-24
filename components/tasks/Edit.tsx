@@ -1,37 +1,53 @@
 /* eslint-disable prettier/prettier */
-import { View } from "react-native";
-import { TextWhite } from "../../App.styles";
-import { InputWhite, PressableButton } from "./Create.styles";
-import { ActivityIndicator, MD2Colors } from "react-native-paper";
-import React from "react";
+import { View } from 'react-native';
+import { InputWhite, Text } from '../../App.styles';
+import { PressableButton } from './Create.styles';
+import React from 'react';
+import { editTask } from './Task';
+import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import { ActivityIndicator, MD2Colors } from 'react-native-paper';
 
-export function Edit({ task, closeModal, changeTask}: {task: any, closeModal: any, changeTask: any}) {
+export function Edit({ task, id, closeModal}: {task: any, id: any, closeModal: any}) {
     const [loading, setLoading] = React.useState(false);
-
-    const [taskTitle, setTasterTitle] = React.useState(task.title);
+    const [taskTitle, setTaskTitle] = React.useState(task.title);
     const [taskDescription, setTaskDescription] = React.useState(task.description);
+
     function edit(){
-        setLoading(true);
+      setLoading(true);
+      editTask(task, id).then(() => {
+          Toast.show({
+              type: 'success',
+              text1: 'Atualizado!',
+              text2: 'Atualização da tarefa concluida com sucesso!',
+          });
+          closeModal();
+      }).catch(() => {
+        Toast.show({
+            type: 'danger',
+            text1: 'Erro',
+            text2: 'Ocorreu um erro ao tentar atualiar a tarefa, tente novamente.',
+        });
+      }).finally(() => {
         setLoading(false);
-        changeTask({taskTitle,taskDescription});
-        closeModal();
+      });
     }
     return (
         <View>
-          <TextWhite>Título</TextWhite>
-          <InputWhite value={taskTitle} onChangeText={ value => setTasterTitle( value)}/>
+          <Text color="white">Título</Text>
+          <InputWhite width="100%" value={taskTitle} onChangeText={ (value: string) => setTaskTitle( value)}/>
 
-          <TextWhite>Descrição</TextWhite>
-          <InputWhite value={taskDescription} onChangeText={ value => setTaskDescription(value) }/>
+          <Text color="white">Descrição</Text>
+          <InputWhite width="100%" value={taskDescription} onChangeText={ (value: string) => setTaskDescription(value) }/>
 
            <PressableButton disabled={loading} onPress={() => edit()}>
               {
                 !loading ?
-                  <TextWhite>Editar</TextWhite>
-                  :
-                  <ActivityIndicator size="large" animating={true} color={MD2Colors.red800} />
+                <Text color="white">EDITAR</Text>
+                    :
+                <ActivityIndicator size="large" animating={true} color={MD2Colors.red800} />
               }
+
            </PressableButton>
         </View>
-    );    
+    );
 }

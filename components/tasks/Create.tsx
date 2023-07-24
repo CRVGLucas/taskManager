@@ -1,59 +1,67 @@
 /* eslint-disable prettier/prettier */
-import React from 'react'
-import { View } from 'react-native'
-import { InputWhite, PressableButton } from "./Create.styles";
-import { TextWhite } from "../../App.styles";
-import { ActivityIndicator, MD2Colors } from "react-native-paper";
-import { db } from "../../firebase/config";
-import { addDoc, collection } from "firebase/firestore/lite";
-import { doc, setDoc } from "firebase/firestore"; 
+import React from 'react';
+import { View, Keyboard } from 'react-native';
+import { PressableButton } from './Create.styles';
+import { InputWhite, Text } from '../../App.styles';
+import { ActivityIndicator, MD2Colors } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
+import { createTask } from './Task';
 
 export default function Create({ closeModal }: {closeModal: any}) {
     const [title, setTitle] = React.useState('');
     const [description, setDescription] = React.useState('');
-    const date = new Date();
     const [loading, setLoading] = React.useState(false);
 
     function hideModal(){
       closeModal();
     }
 
-    async function createTask(){
-
-      if ( title && description && date ){
+    async function create(){
+      Keyboard.dismiss();
+      if ( title && description ){
         try {
-          // setLoading(true);
-          // const form = { title: title, description: description, createdAt: date, done: false };
-          // const tasksCol = collection(db, 'tasks');
-          hideModal();
-          // await addDoc(tasksCol, form).then((response: any) => {
-          //   console.log('resposta: ', response)
-          //  hideModal();
-          // });
+          setLoading(true);
+          createTask(title, description).then(() => {
+              Toast.show({
+                type: 'success',
+                text1: 'Sucesso!',
+                text2: 'Tarefa criada com sucesso!',
+              });
+              hideModal();
+          }).catch((errorCreate) => {
+              console.log('erro ao cadastrar: ', errorCreate);
+          });
         } catch ( error: any) {
-
+            Toast.show({
+              type: 'error',
+              text2: 'Erro no cadastro, tente novamente',
+            });
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
       }
     }
 
     return (
         <View>
-          <TextWhite>Título</TextWhite>
-          <InputWhite onChangeText={ value => setTitle(value)}/>
+          <Text color="white">Título</Text>
+          <InputWhite width="100%" onChangeText={ (value: string) => setTitle(value)}/>
 
-          <TextWhite>Descrição</TextWhite>
-          <InputWhite onChangeText={ value => setDescription(value)}/>
+          <Text color="white">Descrição</Text>
+          <InputWhite width="100%" onChangeText={ (value: string) => setDescription(value)}/>
 
-           <PressableButton disabled={loading} onPress={() => createTask()}>
+          {
+            title.length > 0 && description.length > 0 &&
+            <PressableButton disabled={loading} onPress={() => create()}>
               {
                 !loading ?
-                  <TextWhite>CADASTRAR</TextWhite>
+                  <Text color="white">CADASTRAR</Text>
                   :
                   <ActivityIndicator size="large" animating={true} color={MD2Colors.red800} />
               }
-           </PressableButton>
+            </PressableButton>
+          }
+
         </View>
     );
 }

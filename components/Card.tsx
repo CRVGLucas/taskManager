@@ -1,45 +1,53 @@
 /* eslint-disable prettier/prettier */
 import React from 'react';
-import {TextWhite, ViewRow} from '../App.styles';
+import {Text, ViewFlex, green, light} from '../App.styles';
 import {CardContainer} from './Card.styles';
-import {Checkbox, Modal} from 'react-native-paper';
+import {Checkbox} from 'react-native-paper';
 import {Pressable} from 'react-native';
-import { Edit } from './tasks/Edit';
-export function Card({task, changeStatus, callModal}: {task: any; changeStatus: any, callModal: any}) {
+import { Pencil, Trash } from 'phosphor-react-native';
+export function Card({task, id, deleteFunction, changeStatus, callModal}: {task: any, id: any, deleteFunction: any, changeStatus: any, callModal: any}) {
   const date = new Date(task.createdAt.seconds * 1000);
-  const showModal = () => callModal(task);
-  
-
-  function handleStatus() {
-    changeStatus(task);
-  }
+  const showModal = () => callModal(task, id);
+  function deleteTask () { deleteFunction(task, id) }
+  function handleStatus() { changeStatus(task, id);}
 
   return (
     <CardContainer>
-      <ViewRow>
-        <TextWhite>
+      <ViewFlex direction="row" justify="space-between">
+        <Text color="white">
            {date.getDate() + '/' + date.getMonth() + '/' + date.getFullYear()}
-        </TextWhite>
+        </Text>
+        <ViewFlex direction="row" justify="center">
+          <Pressable  onPress={() => deleteTask()}>
+            <Trash/>
+          </Pressable>
 
-        <Pressable onPress={() => showModal()}>
-            <TextWhite>Editar</TextWhite>
-        </Pressable>
-      </ViewRow>
+          {
+            !task.done &&
+            <Pressable onPress={() => showModal()}>
+              <Pencil color={light}/>
+            </Pressable>
+          }
 
-      <ViewRow>
-        <TextWhite>{task.title}</TextWhite>
-        <ViewRow>
-          <TextWhite>{task.done ? 'Completo' : 'Incompleto'}</TextWhite>
+        </ViewFlex>
+
+      </ViewFlex>
+
+      <ViewFlex direction="row" justify="space-between">
+        <Text color="white">{task.title}</Text>
+        <ViewFlex direction="row" justify="space-between">
+          <Text color="white">{task.done ? 'Completo' : 'Incompleto'}</Text>
           <Checkbox
             status={task.done ? 'checked' : 'unchecked'}
             uncheckedColor="red"
-            color="green"
+            color={green}
+            disabled={task.done}
             onPress={() => handleStatus()}
           />
-        </ViewRow>
-      </ViewRow>
-      <TextWhite>{task.description}</TextWhite>
+        </ViewFlex>
+      </ViewFlex>
 
+      <Text color="white">{task.description}</Text>
     </CardContainer>
   );
 }
